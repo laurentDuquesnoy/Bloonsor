@@ -1,7 +1,8 @@
 ﻿@using System.Collections;
+@using System.Diagnostics
 @using System.Timers
 @page "/"
-@implements IDisposable;
+@implements IDisposable
 
 <PageTitle>Bloonsor</PageTitle>
 
@@ -12,7 +13,7 @@
 {
     foreach (var b in Balloons)
     {
-        <BalloonComponent Balloon="b" OnClick="@( () => {  PopBalloon(new MouseEventArgs(), b);})"></BalloonComponent>
+        <BalloonComponent Balloon="b" OnBalloonPopped="Pop"></BalloonComponent>
     }
 }
 
@@ -36,22 +37,25 @@
         return base.OnInitializedAsync();
     }
 
-    private void AddBalloon(object sender, ElapsedEventArgs e)
+    private void AddBalloon(object? sender, ElapsedEventArgs e)
     {
         var r = new Random();
         if (Balloons is {Count: < 10 })
         {
-            Balloons?.Add(new Balloon
+            
+            var balloon = new Balloon
             {
                 PositionLeft = r.Next(0 , 1200),
                 PositionTop = r.Next(40, 600),
                 BalloonIndex = r.Next(1,4)
-            });
+            };
+            balloon.SourcePath = $"images/balloon{balloon.BalloonIndex}.png";
+            Balloons?.Add(balloon);
         }
         StateHasChanged();
     }
 
-    private void PopBalloon(MouseEventArgs e, Balloon b)
+    private void Pop(Balloon? b)
     {
         var removed = Balloons != null && Balloons.Remove(b);
         Score++;
@@ -60,7 +64,7 @@
 
     public void Dispose()
     {
-        Timer?.Stop();
-        Timer?.Dispose();
+        Timer.Stop();
+        Timer.Dispose();
     }
 }

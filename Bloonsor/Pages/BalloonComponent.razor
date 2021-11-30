@@ -1,22 +1,44 @@
-﻿
+﻿@using System.Diagnostics
+@using System.Runtime.Loader
+@using System.Timers
+@implements IDisposable
+
 @if (Balloon != null)
 {
     <div style="top: @(Balloon.PositionTop)px; 
                 left: @(Balloon.PositionLeft)px;
                 position: absolute;"
-         @onclick="OnClick">
-        <img src="images/balloon@(Balloon.BalloonIndex).png"
+         @onclick="PopBalloon">
+        <img src="@(Balloon.SourcePath)"
              alt="balloon"
         />
     </div>
 }
 
-
-
 @code {
+    private Timer PopTimer { get; set; }
     [Parameter]
     public Balloon? Balloon { get; set; }
     
     [Parameter]
-    public EventCallback<MouseEventArgs> OnClick { get; set; }
+    public EventCallback<Balloon?> OnBalloonPopped { get; set; }
+    
+    private Task PopBalloon()
+    {
+        PopTimer = new Timer{Interval = 500};
+        PopTimer.Start();
+        Balloon.SourcePath = "images/popped.png";
+        StateHasChanged();
+        PopTimer.Elapsed += async (o ,a) =>
+        {
+            await OnBalloonPopped.InvokeAsync(Balloon);
+        };
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        PopTimer.Stop();
+        PopTimer.Dispose();
+    }
 }
