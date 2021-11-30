@@ -1,0 +1,22 @@
+﻿
+@if (Balloon != null)
+{
+    <div style="top: @(Balloon.PositionTop)px; 
+                left: @(Balloon.PositionLeft)px;
+                position: absolute;"
+         @onclick="OnClick">
+        <img src="images/balloon@(Balloon.BalloonIndex).png"
+             alt="balloon"
+        />
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public Balloon? Balloon { get; set; }
+    
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

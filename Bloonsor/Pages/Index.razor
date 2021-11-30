@@ -1,0 +1,62 @@
+﻿@using System.Collections;
+@using System.Timers
+@page "/"
+@implements IDisposable;
+
+<PageTitle>Bloonsor</PageTitle>
+
+<h1>Bloonsor, world's best balloon popper</h1>
+
+@if (Balloons != null)
+{
+    foreach (var b in Balloons)
+    {
+        <BalloonComponent Balloon="b" OnClick="@( () => {  PopBalloon(new MouseEventArgs(), b);})"></BalloonComponent>
+    }
+}
+
+@code{
+
+    private Timer? Timer { get; set; }
+    
+    [Parameter]
+    public Balloon? Balloon { get; set; }
+    
+    private IList<Balloon>? Balloons { get; set; }
+    
+    protected override Task OnInitializedAsync()
+    {
+        Balloons = new List<Balloon>();
+        Timer = new Timer();
+        Timer.Elapsed += AddBalloon;
+        Timer.Interval = 2000;
+        Timer.Enabled = true;
+        return base.OnInitializedAsync();
+    }
+
+    private void AddBalloon(object sender, ElapsedEventArgs e)
+    {
+        var r = new Random();
+        if (Balloons is {Count: < 10 })
+        {
+            Balloons?.Add(new Balloon
+            {
+                PositionLeft = r.Next(0 , 1200),
+                PositionTop = r.Next(40, 600),
+                BalloonIndex = r.Next(1,4)
+            });
+        }
+        StateHasChanged();
+    }
+
+    private void PopBalloon(MouseEventArgs e, Balloon b)
+    {
+        var removed = Balloons != null && Balloons.Remove(b);
+    }
+
+    public void Dispose()
+    {
+        Timer?.Stop();
+        Timer?.Dispose();
+    }
+}
