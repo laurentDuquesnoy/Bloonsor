@@ -6,6 +6,7 @@
 <PageTitle>Bloonsor</PageTitle>
 
 <h1>Bloonsor, world's best balloon popper</h1>
+<h2>Your score = @Score</h2>
 
 @if (Balloons != null)
 {
@@ -23,6 +24,7 @@
     public Balloon? Balloon { get; set; }
     
     private IList<Balloon>? Balloons { get; set; }
+    private int Score { get; set; }
     
     protected override Task OnInitializedAsync()
     {
@@ -52,6 +54,8 @@
     private void PopBalloon(MouseEventArgs e, Balloon b)
     {
         var removed = Balloons != null && Balloons.Remove(b);
+        Score++;
+        StateHasChanged();
     }
 
     public void Dispose()
